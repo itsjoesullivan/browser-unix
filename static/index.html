@@ -6,22 +6,25 @@
         margin: 0px;
       }
       #terminals {
-        padding: 0px;
-        position: relative;
-        top: 0px;
-        bottom: 0px;
-        left: 0px;
-        right: 0px;
+        font-family: monaco, monospace;
+        font-size: 16px;
       }
       .terminal {
         position: absolute;
         top: 0px;
         left: 0px;
         background: black;
-        font-family: monaco, monospace;
-        font-size: 16px;
         padding: 0px;
         overflow-y: hidden;
+        border: 1px solid rgb(127,127,127);
+      }
+      .terminal.active {
+        border-color: rgb(255,63,63);
+      }
+      .terminal * {
+        border-width: 0px;
+      }
+      .terminal .cursor {
       }
     </style>
   </head>

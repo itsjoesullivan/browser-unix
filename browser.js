@@ -24,16 +24,28 @@ function makeSh () {
 }
 
 var active = null;
-window.addEventListener('keydown', function (e) {
+window.addEventListener('keydown', function (ev) {
     if (active) active.keydown(ev);
 });
 
 var layout = require('vec2-layout/grid');
 var elements = [];
+function setActive (sh) {
+    elements.forEach(function (e) {
+        e.classList.remove('active');
+    });
+    sh.element.classList.add('active');
+    active = sh;
+}
+
 for (var i = 0; i < 4; i++) (function (sh) {
     sh.element.classList.add('terminal');
-    elements.push({ set: function (x, y) {
-console.log(x, y);
+    sh.element.addEventListener('mouseover', function (ev) {
+        setActive(sh);
+    });
+    
+    elements.push(sh.element);
+    sh.element.set = function (x, y) {
         sh.element.style.position = 'absolute';
         sh.element.style.left = x;
         sh.element.style.top = y;
@@ -43,7 +55,14 @@ console.log(x, y);
             sh.element.style.width = w - 1;
             sh.element.style.height = h - 1;
         }
-    } });
+    };
 })(makeSh());
 
-layout(elements, { size: { x: window.innerWidth, y: window.innerHeight } });
+function resize () {
+    layout(elements, { size: {
+        x: window.innerWidth - 2,
+        y: window.innerHeight - 2
+    } });
+}
+resize();
+window.addEventListener('resize', resize);
