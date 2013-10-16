@@ -1,6 +1,13 @@
 var terminal = require('browser-terminal');
 var bashful = require('bashful');
-var fs = require('bashful-fs');
+process.umask = function () { return 2 };
+var fs = require('fs');
+window.fs = fs;
+window.Store = require('level-store');
+
+var mkdirp = require('mkdirp');
+
+mkdirp.sync('/home/guest');
 
 function makeSh () {
     var sh = bashful({
@@ -12,15 +19,19 @@ function makeSh () {
             PWD: '/home/guest',
             UID: 1000
         },
-        read: fs.createReadStream,
-        write: fs.createWriteStream,
+        read: bind(fs, fs.createReadStream),
+        write: bind(fs, fs.createWriteStream),
         spawn: require('./spawn.js'),
-        exists: fs.exists
+        exists: bind(fs, fs.exists)
     });
     
     var term = terminal().appendTo('#terminals');
     term.pipe(sh.createStream()).pipe(term);
     return term;
+}
+
+function bind (r, f) {
+    return function () { return f.apply(r, arguments) };
 }
 
 var active = null;

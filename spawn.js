@@ -6,7 +6,7 @@ var minimist = require('minimist');
 var parents = require('parents');
 var path = require('path');
 
-var fs = require('bashful-fs');
+var fs = require('fs');
 
 exports = module.exports = function (cmd, args, opts) {
     if ({}.hasOwnProperty.call(exports, cmd)) {
@@ -175,7 +175,6 @@ exports.mkdir = function (args, opts) {
 };
 
 exports.grep = function (args, opts) {
-    var self = this;
     var argv = minimist(args);
     if (argv._.length === 0) {
         var tr = through();
@@ -207,4 +206,25 @@ exports.grep = function (args, opts) {
     })(argv._);
     
     return dup;
+};
+
+exports.cat = function (args, opts) {
+    var argv = minimist(args);
+    var output = through();
+    var input = through();
+    
+    var files = argv._;
+    if (files.length === 0) files.push('-');
+    
+    (function next () {
+        if (files.length === 0) return output.queue(null);
+        var file = files.shift();
+        var rfile = path.resolve(opts.cwd, file);
+        var s = file === '-' ? input : fs.createReadStream(rfile);
+        s.pipe(output, { end: false });
+        s.on('data', function () {});
+        s.on('end', next);
+    })();
+    
+    return duplexer(input, output);
 };
