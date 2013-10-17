@@ -41,7 +41,11 @@ function bind (r, f) {
 
 var active = null;
 window.addEventListener('keydown', handleActive(function (ev) {
-    var c = decodeKey(ev);
+    var c = decodeKey(ev, {
+        arrows: false,
+        'delete': false,
+        backspace: false
+    });
     if (c === '\r') c = '\r\n';
     if (c) active.write(c);
     active.terminal.keyDown(ev);
