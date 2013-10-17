@@ -1,6 +1,7 @@
 var exterminate = require('exterminate');
 var bashful = require('bashful');
 var through = require('through');
+var decodeKey = require('browser-keycode');
 
 process.umask = function () { return 2 };
 var fs = require('fs');
@@ -40,7 +41,9 @@ function bind (r, f) {
 
 var active = null;
 window.addEventListener('keydown', handleActive(function (ev) {
-    echoChar(active, ev);
+    var c = decodeKey(ev);
+    if (c === '\r') c = '\r\n';
+    if (c) active.write(c);
     active.terminal.keyDown(ev);
 }));
 window.addEventListener('keypress', handleActive(function (ev) {
@@ -49,26 +52,12 @@ window.addEventListener('keypress', handleActive(function (ev) {
 
 function handleActive (cb) {
     return function (ev) {
-        if (ev.ctrlKey && String.fromCharCode(ev.keyCode) === 'R') return;
+        var c = String.fromCharCode(ev.keyCode);
+        if (ev.ctrlKey && c === 'R') return;
+        if (ev.ctrlKey && c === 'L') return;
+        if (ev.ctrlKey && ev.shiftKey && c === 'J') return;
         if (active) cb(ev);
     };
-}
-
-function echoChar (sh, ev) {
-    var c = ev.keyCode;
-    if (ev.ctrlKey || ev.altKey) return;
-    if (ev.shiftKey && c >= 65 && c <= 90) {
-        sh.write(String.fromCharCode(c));
-    }
-    else if (c >= 65 && c <= 90) {
-        sh.write(String.fromCharCode(c + 32));
-    }
-    else if (c === 13) {
-        sh.write('\r\n');
-    }
-    else if (c >= 32 && c < 65) {
-        sh.write(String.fromCharCode(c));
-    }
 }
 
 var layout = require('vec2-layout/grid');
