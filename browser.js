@@ -6,8 +6,7 @@ window.fs = fs;
 window.Store = require('level-store');
 
 var mkdirp = require('mkdirp');
-
-mkdirp.sync('/home/guest');
+mkdirp('/home/guest');
 
 function makeSh () {
     var sh = bashful({
@@ -49,7 +48,7 @@ function setActive (sh) {
     active = sh;
 }
 
-for (var i = 0; i < 4; i++) (function (sh) {
+for (var i = 0; i < 1; i++) (function (sh) {
     sh.element.classList.add('terminal');
     sh.element.addEventListener('mouseover', function (ev) {
         setActive(sh);
