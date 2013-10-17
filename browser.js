@@ -1,5 +1,7 @@
-var terminal = require('browser-terminal');
+var exterminate = require('exterminate');
 var bashful = require('bashful');
+var through = require('through');
+
 process.umask = function () { return 2 };
 var fs = require('fs');
 window.fs = fs;
@@ -24,8 +26,11 @@ function makeSh () {
         exists: bind(fs, fs.exists)
     });
     
-    var term = terminal().appendTo('#terminals');
-    term.pipe(sh.createStream()).pipe(term);
+    var term = exterminate(80, 25);
+    term.appendTo('#terminals');
+    term.pipe(sh.createStream()).pipe(through(function (s) {
+        this.queue(s.replace(/(?!\r)\n/g, '\r\n'));
+    })).pipe(term);
     return term;
 }
 
@@ -34,9 +39,37 @@ function bind (r, f) {
 }
 
 var active = null;
-window.addEventListener('keydown', function (ev) {
-    if (active) active.keydown(ev);
-});
+window.addEventListener('keydown', handleActive(function (ev) {
+    echoChar(active, ev);
+    active.terminal.keyDown(ev);
+}));
+window.addEventListener('keypress', handleActive(function (ev) {
+    active.terminal.keyPress(ev);
+}));
+
+function handleActive (cb) {
+    return function (ev) {
+        if (ev.ctrlKey && String.fromCharCode(ev.keyCode) === 'R') return;
+        if (active) cb(ev);
+    };
+}
+
+function echoChar (sh, ev) {
+    var c = ev.keyCode;
+    if (ev.ctrlKey || ev.altKey) return;
+    if (ev.shiftKey && c >= 65 && c <= 90) {
+        sh.write(String.fromCharCode(c));
+    }
+    else if (c >= 65 && c <= 90) {
+        sh.write(String.fromCharCode(c + 32));
+    }
+    else if (c === 13) {
+        sh.write('\r\n');
+    }
+    else if (c >= 32 && c < 65) {
+        sh.write(String.fromCharCode(c));
+    }
+}
 
 var layout = require('vec2-layout/grid');
 var elements = [];
@@ -44,26 +77,27 @@ function setActive (sh) {
     elements.forEach(function (e) {
         e.classList.remove('active');
     });
-    sh.element.classList.add('active');
+    sh.terminal.element.classList.add('active');
     active = sh;
 }
 
 for (var i = 0; i < 1; i++) (function (sh) {
-    sh.element.classList.add('terminal');
-    sh.element.addEventListener('mouseover', function (ev) {
+    var elem = sh.terminal.element;
+    elem.classList.add('terminal');
+    elem.addEventListener('mouseover', function (ev) {
         setActive(sh);
     });
     
-    elements.push(sh.element);
-    sh.element.set = function (x, y) {
-        sh.element.style.position = 'absolute';
-        sh.element.style.left = x;
-        sh.element.style.top = y;
+    elements.push(elem);
+    elem.set = function (x, y) {
+        elem.style.position = 'absolute';
+        elem.style.left = x;
+        elem.style.top = y;
         return { size: { set: set } };
         
         function set (w, h) {
-            sh.element.style.width = w - 1;
-            sh.element.style.height = h - 1;
+            elem.style.width = w - 1;
+            elem.style.height = h - 1;
         }
     };
 })(makeSh());
