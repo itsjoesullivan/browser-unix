@@ -46,7 +46,6 @@ window.addEventListener('keydown', handleActive(function (ev) {
         'delete': false,
         backspace: false
     });
-    if (c === '\r') c = '\r\n';
     if (c) active.write(c);
     active.terminal.keyDown(ev);
 }));
