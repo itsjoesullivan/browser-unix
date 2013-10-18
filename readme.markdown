@@ -49,7 +49,7 @@ Then compile your `browser.js` code with [browserify](http://browserify.org):
 
 ```
 browserify browser.js > static/bundle.js
-``
+```
 
 # license
 
