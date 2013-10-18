@@ -6,7 +6,7 @@ var minimist = require('minimist');
 var parents = require('parents');
 var path = require('path');
 
-var fs = require('fs');
+var fs = require('level-fs-browser');
 
 exports = module.exports = function (cmd, args, opts) {
     if ({}.hasOwnProperty.call(exports, cmd)) {

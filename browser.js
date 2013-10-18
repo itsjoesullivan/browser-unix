@@ -1,12 +1,11 @@
 var exterminate = require('exterminate');
 var bashful = require('bashful');
 var through = require('through');
-var decodeKey = require('browser-keycode');
+var decodeKey = require('ansi-keycode');
 
 process.umask = function () { return 2 };
-var fs = require('fs');
+var fs = require('level-fs-browser');
 window.fs = fs;
-window.Store = require('level-store');
 
 var mkdirp = require('mkdirp');
 mkdirp('/home/guest');
