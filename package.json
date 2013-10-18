@@ -12,11 +12,9 @@
     "resumer": "~0.0.0",
     "split": "~0.2.6",
     "through": "~2.3.4",
-    "vec2-layout": "~0.1.0"
-  },
-  "bundledDependencies": [ "mkdirp" ],
-  "scripts": {
-    "build": "browserify browser.js -o static/bundle.js",
-    "watch": "watchify browser.js -o static/bundle.js -dv"
+    "vec2-layout": "~0.1.0",
+    "next-tick": "~0.1.0",
+    "js-vim": "~0.4.1",
+    "js-git": "~0.5.2"
   }
 }

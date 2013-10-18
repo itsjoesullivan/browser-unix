@@ -1,0 +1,8 @@
+{
+  "name": "browser-unix-example",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "browserify browser.js -o static/bundle.js",
+    "watch": "watchify browser.js -o static/bundle.js -dv"
+  }
+}
