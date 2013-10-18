@@ -1,5 +1,4 @@
 var exterminate = require('exterminate');
-var ever = require('ever');
 var bashful = require('bashful');
 var through = require('through');
 var decodeKey = require('ansi-keycode');
@@ -38,6 +37,7 @@ Unix.prototype.createTerminal = function () {
     var self = this;
     var sh = createSh(fs);
     var term = exterminate(80, 25);
+    term.sh = sh;
     self.terminals.push(term);
     
     term.pipe(sh.createStream()).pipe(through(function (s) {
@@ -106,7 +106,9 @@ Unix.prototype.listenTo = function (elem) {
             'delete': false,
             backspace: false
         });
-        if (c) self.active.write(c);
+        if (c && !self.active.sh.current) {
+            self.active.write(c);
+        }
         self.active.terminal.keyDown(ev);
     }));
     elem.addEventListener('keypress', handleKey(function (ev) {

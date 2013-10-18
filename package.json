@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "dependencies": {
     "ansi-keycode": "~0.0.0",
-    "bashful": "~1.5.0",
+    "bashful": "~1.6.0",
     "duplexer": "~0.1.1",
-    "ever": "~0.0.3",
     "exterminate": "~1.4.1",
     "level-fs-browser": "~0.1.0",
     "minimist": "~0.0.1",
@@ -16,7 +15,6 @@
     "vec2-layout": "~0.1.0",
     "next-tick": "~0.1.0",
     "js-vim": "~0.4.1",
-    "js-git": "~0.5.2",
     "object-inspect": "~0.1.3"
   }
 }
