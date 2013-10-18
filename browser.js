@@ -2,10 +2,24 @@ var exterminate = require('exterminate');
 var bashful = require('bashful');
 var through = require('through');
 var decodeKey = require('ansi-keycode');
-var audioStream = require('./lib/audio_stream.js');
-
-process.umask = function () { return 2 };
 var fs = require('level-fs-browser');
+
+var audioStream = require('./lib/audio_stream.js');
+if (!process.umask) process.umask = function () { return 2 };
+
+var charDevs = {
+    '/dev/audio': true
+};
+fs.stat = (function (subStat) {
+    return function (file, cb) {
+        subStat.call(fs, file, function (err, stat) {
+            if (stat && charDevs[file]) {
+                stat.isCharacterDevice = function () { return true };
+            }
+            cb(err, stat);
+        });
+    };
+})(fs.stat);
 window.fs = fs;
 
 var mkdirp = require('mkdirp');

@@ -67,11 +67,17 @@ exports.ls = function (args, opts) {
         });
         
         function done () {
+            var colors = argv.color === undefined || argv.color === 'always';
+            
             Object.keys(stats).sort().forEach(function (file) {
                 var isDir = stats[file].isDirectory();
-                if (isDir && argv.color === undefined
-                || argv.color === 'always') {
+                var isCh = stats[file].isCharacterDevice();
+                
+                if (isDir && colors) {
                     file = '\x1b[0m\x1b[01;34m' + file + '\x1b[0m';
+                }
+                else if (isCh && colors) {
+                    file = '\x1b[0m\x1b[40;33;01m' + file + '\x1b[0m';
                 }
                 if (isDir && argv.F) file += '/';
                 tr.queue(file + '\n');
