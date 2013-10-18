@@ -5,6 +5,7 @@
     "ansi-keycode": "~0.0.0",
     "bashful": "~1.5.0",
     "duplexer": "~0.1.1",
+    "ever": "~0.0.3",
     "exterminate": "~1.4.1",
     "level-fs-browser": "~0.1.0",
     "minimist": "~0.0.1",
