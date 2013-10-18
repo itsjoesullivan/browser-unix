@@ -8,13 +8,13 @@
     "exterminate": "~1.4.1",
     "level-fs-browser": "~0.1.0",
     "minimist": "~0.0.1",
-    "mkdirp": "~0.3.5",
     "parents": "~0.0.1",
     "resumer": "~0.0.0",
     "split": "~0.2.6",
     "through": "~2.3.4",
     "vec2-layout": "~0.1.0"
   },
+  "bundledDependencies": [ "mkdirp" ],
   "scripts": {
     "build": "browserify browser.js -o static/bundle.js",
     "watch": "watchify browser.js -o static/bundle.js -dv"

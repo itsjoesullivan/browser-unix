@@ -33,7 +33,14 @@ exports.ls = function (args, opts) {
                 tr.emit('exit', 1);
             }
             else if (!argv.d && s.isDirectory()) {
-                showDir(file, next);
+                fs.readdir(file, function (err, files) {
+                    if (err) {
+                        tr.queue(err + '\n')
+                        tr.queue(null);
+                        tr.emit('exit', 1);
+                    }
+                    else showDir(file, files, next);
+                });
             }
             else {
                 tr.queue(file + '\n');
@@ -42,41 +49,35 @@ exports.ls = function (args, opts) {
         });
     });
     
-    function showDir (dir, next) {
-        fs.readdir(dir, function (err, files) {
-            if (err) {
-                tr.queue(err + '\n')
-                tr.queue(null);
-                tr.emit('exit', 1);
-                return;
-            }
-            var pending = files.length;
-            var stats = {};
-            files.forEach(function (file) {
-                fs.stat(path.join(dir, file), function (err, stat) {
-                    if (err) {
-                        tr.queue(err + '\n');
-                        tr.queue(null);
-                        return tr.emit('exit', 1);
-                    }
-                    stats[file] = stat;
-                    if (--pending === 0) done();
-                });
+    function showDir (dir, files, next) {
+        var pending = files.length;
+        var stats = {};
+        if (pending === 0) done();
+        
+        files.forEach(function (file) {
+            fs.stat(path.join(dir, file), function (err, stat) {
+                if (err) {
+                    tr.queue(err + '\n');
+                    tr.queue(null);
+                    return tr.emit('exit', 1);
+                }
+                stats[file] = stat;
+                if (--pending === 0) done();
             });
-            
-            function done () {
-                Object.keys(stats).sort().forEach(function (file) {
-                    var isDir = stats[file].isDirectory();
-                    if (isDir && argv.color === undefined
-                    || argv.color === 'always') {
-                        file = '\x1b[0m\x1b[01;34m' + file + '\x1b[0m';
-                    }
-                    if (isDir && argv.F) file += '/';
-                    tr.queue(file + '\n');
-                });
-                next();
-            }
         });
+        
+        function done () {
+            Object.keys(stats).sort().forEach(function (file) {
+                var isDir = stats[file].isDirectory();
+                if (isDir && argv.color === undefined
+                || argv.color === 'always') {
+                    file = '\x1b[0m\x1b[01;34m' + file + '\x1b[0m';
+                }
+                if (isDir && argv.F) file += '/';
+                tr.queue(file + '\n');
+            });
+            next();
+        }
     }
     
     return tr;

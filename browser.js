@@ -2,6 +2,7 @@ var exterminate = require('exterminate');
 var bashful = require('bashful');
 var through = require('through');
 var decodeKey = require('ansi-keycode');
+var audioStream = require('./lib/audio_stream.js');
 
 process.umask = function () { return 2 };
 var fs = require('level-fs-browser');
@@ -9,6 +10,10 @@ window.fs = fs;
 
 var mkdirp = require('mkdirp');
 mkdirp('/home/guest');
+
+mkdirp('/dev', function () {
+    fs.writeFile('/dev/audio', '...');
+});
 
 function makeSh () {
     var sh = bashful({
@@ -20,8 +25,19 @@ function makeSh () {
             PWD: '/home/guest',
             UID: 1000
         },
-        read: bind(fs, fs.createReadStream),
-        write: bind(fs, fs.createWriteStream),
+        read: function (file) {
+            if (file === '/dev/audio') {
+                // microphone, todo
+                return through();
+            }
+            return fs.createReadStream.apply(fs, arguments);
+        },
+        write: function (file) {
+            if (file === '/dev/audio') {
+                return audioStream();
+            }
+            return fs.createWriteStream.apply(fs, arguments);
+        },
         spawn: require('./spawn.js'),
         exists: bind(fs, fs.exists)
     });
@@ -74,6 +90,7 @@ function setActive (sh) {
 
 for (var i = 0; i < 1; i++) (function (sh) {
     var elem = sh.terminal.element;
+    if (i === 0) elem.focus();
     elem.classList.add('terminal');
     elem.addEventListener('mouseover', function (ev) {
         setActive(sh);
