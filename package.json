@@ -15,6 +15,7 @@
     "vec2-layout": "~0.1.0",
     "next-tick": "~0.1.0",
     "js-vim": "~0.4.1",
-    "js-git": "~0.5.2"
+    "js-git": "~0.5.2",
+    "object-inspect": "~0.1.3"
   }
 }
